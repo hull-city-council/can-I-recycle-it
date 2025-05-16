@@ -19,7 +19,7 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import Fuse from "fuse.js";
 
-const MemoisedCard = React.memo(function CardComponent({ card, chipColour, index }) {
+const MemoisedCard = React.memo(function CardComponent({ card, chipColour }) {
   return (
     <Card sx={{ height: "100%" }}>
       <CardContent>
@@ -59,7 +59,7 @@ const MemoisedCard = React.memo(function CardComponent({ card, chipColour, index
   );
 });
 
-function App() {
+function App(bin) {
   const [cards, setCards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchResults, setSearchResults] = useState([]);
@@ -70,8 +70,16 @@ function App() {
         const response = await fetch("https://prod-08.westeurope.logic.azure.com/workflows/ca70293f1f794cbbb7a01b83afb5ce35/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=t_1WSC4ALUlj86fVS5lBvbarJ3n3t9tabLWgL0H8Mng");
         const data = await response.json();
         data.sort((a, b) => a.item.localeCompare(b.item));
-        setCards(data);
-        setSearchResults(data);
+        if(bin.length > 0) {
+          const filteredData = data.filter(item => {
+            return item.bins.some(binItem => binItem.Value.toLowerCase() === bin.bin.toLowerCase());
+          });
+          setCards(filteredData);
+          setSearchResults(filteredData);
+        } else {
+          setCards(data);
+          setSearchResults(data);
+        }
         setLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -82,11 +90,13 @@ function App() {
     fetchData();
   }, []);
 
+
+
   const fuse = new Fuse(cards, {
     includeScore: true,
     includeMatches: true,
     threshold: 0.2,
-    keys: ["item"],
+    keys: ["item", "synonyms.Value"],
   })
 
   const handleSearch = (event) => {
@@ -151,17 +161,17 @@ function App() {
               onChange={handleSearch}
 
             />
-            <ButtonGroup variant="outlined" aria-label="A-Z list of items" fullWidth sx={{overflowX: "auto"}}>
+            <ButtonGroup variant="outlined" aria-label="A-Z list of items" fullWidth sx={{ overflowX: "auto" }}>
               {Object.keys(groupedResults).sort().map((letter) => (
                 <Button
-                key={letter}
-                variant="outlined"
-                color="primary"
-                size="large"
-                href={`#${letter}`}
-              >
-                {letter}
-              </Button>
+                  key={letter}
+                  variant="outlined"
+                  color="primary"
+                  size="large"
+                  href={`#${letter}`}
+                >
+                  {letter}
+                </Button>
               ))}
             </ButtonGroup>
           </AppBar>
@@ -169,19 +179,19 @@ function App() {
             {Object.keys(groupedResults).sort().map(letter => (
               <ListItem key={letter} sx={{ width: "100%" }}>
                 <Grid container key={letter} sx={{ width: "100%" }}>
-                  <Grid item size={{xs: 12}}>
-                    <Typography 
-                      variant="h4" 
+                  <Grid item size={{ xs: 12 }}>
+                    <Typography
+                      variant="h4"
                       component="h2"
-                      color="text.secondary" 
-                      sx={{my: 2, marginTop: "-200px", paddingTop: "200px"}} 
+                      color="text.secondary"
+                      sx={{ my: 2, marginTop: "-200px", paddingTop: "200px" }}
                       id={letter}>
-                        {letter}
+                      {letter}
                     </Typography>
                   </Grid>
-                  <Grid container item size={{xs: 12}}  spacing={2}>
+                  <Grid container item size={{ xs: 12 }} spacing={2}>
                     {groupedResults[letter].map((card, index) => (
-                      <Grid item size={{xs: 12, md: 6, lg: 4}} key={index}>
+                      <Grid item size={{ xs: 12, md: 6, lg: 4 }} key={index}>
                         <MemoisedCard card={card} chipColour={chipColour} index={index} />
                       </Grid>
                     ))}
