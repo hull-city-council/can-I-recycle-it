@@ -1,5 +1,5 @@
 {
-  "name": "can-i-recycle-it",
+  "name": "what-goes-in-this-bin",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,10 +11,6 @@
     "predeploy": "npm run build && sh predeploy.sh"
   },
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^7.0.0",
-    "@mui/material": "^7.0.0",
     "@r2wc/react-to-web-component": "^2.0.4",
     "fuse.js": "^7.1.0",
     "react": "^19.0.0",
@@ -25,10 +21,14 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
-    "vite": "^6.2.0"
+    "postcss": "^8.5.5",
+    "tailwindcss": "^3.4.17",
+    "vite": "^6.2.0",
+    "vite-plugin-css-injected-by-js": "^3.5.2"
   }
 }

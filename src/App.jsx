@@ -1,61 +1,34 @@
 import React, { useState, useEffect } from "react"
-import {
-  AppBar,
-  Box,
-  Grid,
-  Card,
-  Chip,
-  CardContent,
-  Typography,
-  CircularProgress,
-  TextField,
-  Stack,
-  Divider,
-  List,
-  ListItem,
-  Button,
-  ButtonGroup
-} from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
 import Fuse from "fuse.js";
 
 const MemoisedCard = React.memo(function CardComponent({ card, chipColour }) {
   return (
-    <Card sx={{ height: "100%" }}>
-      <CardContent>
-        <Stack
-          direction="row"
-          spacing={0}
-          sx={{ justifyContent: "space-between" }}
-          useFlexGap
-        >
-          <Typography variant="h5" component="h3">
-            {card.item}
-          </Typography>
+    <div className={"bg-white rounded-lg shadow p-4 h-full flex flex-col justify-between bg-white hover:bg-gray-100 transition-colors duration-200"}>
+      <div className={"flex flex-row justify-between items-center mb-2"}>
+        <h3 className={"text-xl font-bold mr-2"}>{card.item}</h3>
+        <div className={"flex flex-row flex-wrap gap-2"}>
           {card.bins.map((bin, index) => (
-            <Chip
+            <span
               key={index}
-              size="sm"
-              icon={<DeleteIcon />}
-              variant="outlined"
-              color={chipColour(bin.Value)}
-              label={bin.Value}
-            />
+              className={`px-2 py-1 rounded text-xs font-semibold border ${chipColour(bin.Value)}`}
+            >
+              {bin.Value}
+            </span>
           ))}
-        </Stack>
+        </div>
+      </div>
+      <div className={"mb-2"}>
         {card.categories.map((category, index) => (
-          <Typography variant="body1" color="text.secondary" key={index}>
+          <div className={"text-gray-500 text-sm"} key={index}>
             {category.Value}
-          </Typography>
+          </div>
         ))}
-        <Divider component="div" sx={{ mt: 2 }} />
-        <Stack spacing={2} sx={{ mt: 2 }}>
-          <Typography variant="body1" color="text.secondary">
-            {card.description}
-          </Typography>
-        </Stack>
-      </CardContent>
-    </Card>
+      </div>
+      <hr className={"my-2"} />
+      <div className={"text-gray-700 text-base"}>
+        {card.description}
+      </div>
+    </div>
   );
 });
 
@@ -128,14 +101,14 @@ function App(bin) {
   const chipColour = (colour) => {
     switch (colour.toLowerCase()) {
       case "blue bin":
-        return "primary"
+        return "border-blue-500 text-blue-700 bg-blue-100"
       case "brown bin":
-        return "warning"
+        return "border-yellow-600 text-yellow-800 bg-yellow-100"
       case "greencaddy":
-        return "success"
+        return "border-green-600 text-green-800 bg-green-100"
       default:
-        return "default"
-    };
+        return "border-gray-400 text-gray-600 bg-gray-100"
+    }
   }
 
   const groupedResults = groupAndSort(searchResults);
@@ -143,64 +116,45 @@ function App(bin) {
   return (
     <>
       {loading ? (
-        <Stack
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          sx={{ height: "300px" }} >
-          <CircularProgress />
-        </Stack>
+        <div className={"flex justify-center items-center h-72"}>
+          <span className={"w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin inline-block"}></span>
+        </div>
       ) : (
-        <Box sx={{ flexGrow: 1 }}>
-          <AppBar position="sticky" color="inherit" sx={{ px: 5 }} elevation={0}>
-            <TextField
-              label="Filter items..."
-              variant="outlined"
-              fullWidth
-              margin="normal"
+        <div className={"flex flex-col w-full px-5 bg-gray-50"}>
+          <div className={"sticky top-0 z-10 px-5 py-2 backdrop-blur-lg bg-white bg-opacity-80 border-b border-gray-200"}>
+            <input
+              type="text"
+              placeholder="Filter items..."
+              className={"w-full border border-gray-300 rounded px-3 py-2 mb-2 focus:outline-none focus:ring-2 focus:ring-blue-400"}
               onChange={handleSearch}
-
             />
-            <ButtonGroup variant="outlined" aria-label="A-Z list of items" fullWidth sx={{ overflowX: "auto" }}>
+            <div className={"flex flex-row flex-wrap gap-2 overflow-x-auto pb-2"}>
               {Object.keys(groupedResults).sort().map((letter) => (
-                <Button
+                <a
                   key={letter}
-                  variant="outlined"
-                  color="primary"
-                  size="large"
                   href={`#${letter}`}
+                  className={"px-3 py-1 border border-blue-400 rounded text-blue-700 bg-blue-100 hover:bg-blue-200 font-semibold text-base"}
                 >
                   {letter}
-                </Button>
+                </a>
               ))}
-            </ButtonGroup>
-          </AppBar>
-          <List sx={{ width: '100%', bgcolor: 'background.paper', mt: 5 }}>
+            </div>
+          </div>
+          <ul className={"w-full mt-5"}>
             {Object.keys(groupedResults).sort().map(letter => (
-              <ListItem key={letter} sx={{ width: "100%" }}>
-                <Grid container key={letter} sx={{ width: "100%" }}>
-                  <Grid item size={{ xs: 12 }}>
-                    <Typography
-                      variant="h4"
-                      component="h2"
-                      color="text.secondary"
-                      sx={{ my: 2, marginTop: "-200px", paddingTop: "200px" }}
-                      id={letter}>
-                      {letter}
-                    </Typography>
-                  </Grid>
-                  <Grid container item size={{ xs: 12 }} spacing={2}>
+              <li key={letter} className={"w-full border border-gray-200 rounded p-4 mb-4"}>
+                <div className={"w-full"} id={letter}>
+                  <h2 className={"text-2xl font-bold my-4"}>{letter}</h2>
+                  <div className={"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"}>
                     {groupedResults[letter].map((card, index) => (
-                      <Grid item size={{ xs: 12, md: 6, lg: 4 }} key={index}>
-                        <MemoisedCard card={card} chipColour={chipColour} index={index} />
-                      </Grid>
+                      <MemoisedCard card={card} chipColour={chipColour} index={index} key={index} />
                     ))}
-                  </Grid>
-                </Grid>
-              </ListItem>
+                  </div>
+                </div>
+              </li>
             ))}
-          </List>
-        </Box>
+          </ul>
+        </div>
       )}
     </>
   );
